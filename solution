@@ -1,0 +1,63 @@
+--Heaviest hitters--
+SELECT teams.name AS "Team",
+		batting.yearid AS "Year",
+    ROUND(AVG(people.weight), 2) AS "Average_Weight"
+FROM teams
+INNER JOIN batting
+	ON batting.team_id = teams.id
+INNER JOIN people
+	ON people.playerid = batting.playerid
+GROUP BY teams.name, batting.yearid
+ORDER BY 3 DESC
+LIMIT 10;
+
+--Shortest Sluggers--
+SELECT teams.name AS "Team",
+		batting.yearid AS "Year",
+    ROUND(AVG(people.height), 2) AS "Average_height"
+FROM teams
+INNER JOIN batting
+	ON batting.team_id = teams.id
+INNER JOIN people
+	ON people.playerid = batting.playerid
+GROUP BY teams.name, batting.yearid
+ORDER BY 3 ASC
+LIMIT 10;
+
+--Biggest Spenders--
+SELECT teams.name AS "Team", 
+			salaries.yearid AS "Year", 
+      SUM(salaries.salary) AS "Salary"
+FROM salaries
+JOIN teams
+	ON teams.teamid = salaries.teamid
+GROUP BY teams.name, salaries.yearid
+ORDER BY 3 DESC;
+
+--Most Bang for Their Buck in 2010--
+SELECT teams.name AS "Team", 
+			teams.yearid AS "Year", 
+      teams.w AS "Wins",
+      ROUND(SUM(salaries.salary)/SUM(teams.w)) AS "Cost per Win"
+FROM salaries
+JOIN teams
+	ON teams.teamid = salaries.teamid
+WHERE teams.yearid = 2010
+GROUP BY teams.name, teams.yearid, teams.w
+ORDER BY 4 DESC;
+
+--Priciest Starter--
+SELECT people.namegiven AS "Name",
+			pitching.gs AS "Games Started",
+      salaries.salary AS "Salary",
+      ROUND(salaries.salary/pitching.gs) AS "Cost per Start"
+FROM salaries
+JOIN pitching
+	ON pitching.playerid = salaries.playerid
+  AND pitching.yearid = salaries.yearid
+  AND pitching.teamid = salaries.teamid
+JOIN people
+	ON people.playerid = pitching.playerid
+WHERE pitching.gs > 10
+GROUP BY people.namegiven, pitching.gs, salaries.salary
+ORDER BY 4 DESC;
